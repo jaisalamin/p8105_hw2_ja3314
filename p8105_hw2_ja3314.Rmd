@@ -16,8 +16,9 @@ library(tidyverse)
 ```{r}
 transit_df = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
-  select(line, station_name, station_latitude, station_longitude, entry, vending, entrance_type, ada, starts_with("route"))
+  select(line, station_name, station_latitude, station_longitude, entry, vending, entrance_type, ada, starts_with("route")) %>% 
+  mutate(entry = recode(entry, `YES` = "TRUE", `NO` = "FALSE"))
 ```
 
-
+This dataset contains information on different lines and stations in the NYC transit system. The variables it contains range from station name and location to various aspects of the station such as type of entrance and whether or not is is ADA compliant and the subway routes that run through the station. To tidy this data, I first read in the CSV file then cleaned the names. After this step I selected the variables I was interested in and then converted the entry column from character to logical. This data frame's dimensions are [`r dim(transit_df)`].
 
