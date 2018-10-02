@@ -1,0 +1,23 @@
+---
+title: "p8105_hw2_ja3314"
+author: "Jaisal Amin"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+## Loading the tidyverse package
+library(tidyverse)
+```
+
+## Problem 1
+
+```{r}
+transit_df = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
+  janitor::clean_names() %>% 
+  select(line, station_name, station_latitude, station_longitude, entry, vending, entrance_type, ada, starts_with("route"))
+```
+
+
+
