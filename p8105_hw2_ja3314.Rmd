@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Loading the tidyverse package
 library(tidyverse)
+library(readxl)
 ```
 
 ## Problem 1
@@ -65,6 +66,16 @@ table(route_df[["route_name"]])["A"]
 filter(route_df, route_name == "A") %>% 
   filter(ada == "TRUE") %>% 
   nrow()
+```
+
+## Problem 2
+
+Reading in Mr. Trash Wheel:
+```{r}
+trash_wheel_df = readxl::read_excel("./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = "Mr. Trash Wheel", range = cell_cols("A:N")) %>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(dumpster)) %>% 
+  mutate(sports_balls = as.integer(sports_balls))
 ```
 
 
