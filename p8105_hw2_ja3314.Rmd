@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
 library(p8105.datasets)
+library(openintro)
+
 ```
 
 ## Problem 1
@@ -108,16 +110,16 @@ The first dataset contains multiple variables regarding the amount and types of 
 ## Problem 3
 
 ```{r}
-brfss_df = filter(brfss_smart2010, Topic == "Overall Health") %>% # focusing on overall health topic
+brfss_df = filter(brfss_smart2010, Topic == "Overall Health") %>% # focusing on "overall health" topic
   janitor::clean_names() %>% 
   select(-class, -topic, -question, -sample_size, -confidence_limit_low:-geo_location) %>% # excluding variables
   spread(key = response, value = data_value) %>% # converting responses to column names
   janitor::clean_names() %>% # cleaning new column names
   mutate(proportion = (excellent + very_good)/(excellent + fair + good + poor + very_good)) # adding column with proportion of "excellent" or "very good" responses
-  
+
 ```
 
-
+This dataset contains information from `r nrow(distinct(brfss_df, locationdesc))` distinct locations and `rnrow(distinct(brfss_df, locationabbr))` distinct states (including DC). `r state_freq = count(brfss_df, locationabbr)` `r abbr2state(state_freq[which.max(state_freq$n), 1])` is the state with the most observations.
 
 
 
