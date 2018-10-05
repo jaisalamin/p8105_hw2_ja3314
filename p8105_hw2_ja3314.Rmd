@@ -13,6 +13,13 @@ library(readxl)
 library(p8105.datasets)
 library(openintro)
 
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+theme_set(theme_bw() + theme(legend.position = "bottom"))
+
 ```
 
 ## Problem 1
@@ -24,7 +31,7 @@ transit_df = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>
   mutate(entry = recode(entry, `YES` = "TRUE", `NO` = "FALSE"))
 ```
 
-This dataset contains information on different lines and stations in the NYC transit system. The variables it contains range from station name and location to various aspects of the station such as type of entrance and whether or not is is ADA compliant and the subway routes that run through the station. To tidy this data, I first read in the CSV file then cleaned the names. After this step I selected the variables I was interested in and then converted the entry column from character to logical. This data frame's dimensions are [`r dim(transit_df)`].
+This dataset contains information on different lines and stations in the NYC transit system. The variables it contains range from station name and location to various aspects of the station such as type of entrance and whether or not is is ADA compliant and the subway routes that run through the station. To tidy this data, I first read in the CSV file then cleaned the names. I then selected the variables I was interested in and recoded the data in the 'entry' column to read as either TRUE or FALSE. This data frame's dimensions are [`r dim(transit_df)`] [rows x columns]. These data are more tidy now than they were in the .csv file however the way the route data - specifically route number and names - is presented could still be improved.
 
 **Number of distinct stations:**
 ```{r}
@@ -105,7 +112,7 @@ prcp_df = bind_rows(prcp_2016, prcp_2017) %>%
   janitor::clean_names() %>% 
   mutate(month = month.name[month])
 ```
-The first dataset contains multiple variables regarding the amount and types of trash and collected by Mr. Trash Wheel and number of homes powered by the energy created. The dimensions of this data frame are `r dim(trash_wheel_df)` and there are `r (nrow(trash_wheel_df)) -1` total observations, with the last row containing variable totals. The second data frame contains information about precipitation in 2016 and 2017 and has dimensions of `r dim(prcp_df)`. There are `r filter(prcp_df, year == 2017) %>% select(total) %>% filter( !is.na(total)) %>% nrow()` months worth of data for 2017 and `r filter(prcp_df, year == 2016) %>% select(total) %>% nrow()` for 2016. The total precipitation for 2017 was `r filter(prcp_df,  year == 2017) %>% select(total) %>% sum()`. The median number of sports balls collected was `r median(trash_wheel_df$sports_balls)`.
+The first dataset contains multiple variables regarding the amount and types of trash and collected by Mr. Trash Wheel and number of homes powered by the energy created. The dimensions of this data frame are [`r dim(trash_wheel_df)`] [rows x columns] and there are `r (nrow(trash_wheel_df)) -1` total observations, with the last row containing variable totals. The second data frame contains information about precipitation in 2016 and 2017 and has dimensions of [`r dim(prcp_df)`] [rows x columns]. There are `r filter(prcp_df, year == 2017) %>% select(total) %>% filter( !is.na(total)) %>% nrow()` months worth of data for 2017 and `r filter(prcp_df, year == 2016) %>% select(total) %>% nrow()` for 2016. The total precipitation for 2017 was `r filter(prcp_df,  year == 2017) %>% select(total) %>% sum()`. The median number of sports balls collected was `r median(trash_wheel_df$sports_balls)`.
 
 ## Problem 3
 
@@ -119,7 +126,32 @@ brfss_df = filter(brfss_smart2010, Topic == "Overall Health") %>% # focusing on 
 
 ```
 
-This dataset contains information from `r nrow(distinct(brfss_df, locationdesc))` distinct locations and `rnrow(distinct(brfss_df, locationabbr))` distinct states (including DC). `r state_freq = count(brfss_df, locationabbr)` `r abbr2state(state_freq[which.max(state_freq$n), 1])` is the state with the most observations.
+This dataset contains information from `r nrow(distinct(brfss_df, locationdesc))` distinct locations and `r nrow(distinct(brfss_df, locationabbr))` distinct states - including the District of Columbia. `r state_freq = count(brfss_df, locationabbr)` `r abbr2state(state_freq[which.max(state_freq$n), 1])` is the state with the most observations. In 2002, the median of the "excellent" response values was `r brfss_df %>% group_by(year) %>% summarize(median_excl = median(excellent, na.rm = TRUE)) %>% filter(year == 2002) %>% select(median_excl)`. 
+
+**Histogram:**
+```{r}
+brfss_df %>% 
+  group_by(year) %>% 
+  filter(year == 2002) %>% 
+  select(excellent) %>% 
+  ggplot(aes(x = excellent)) + 
+  geom_histogram() +
+  labs(
+    title = "'Excellent' responses in 2002"
+  )
+```
+
+**Scatterplot:**
+```{r}
+brfss_df %>% 
+  filter(locationdesc %in% c("NY - New York County", "NY - Queens County")) %>% 
+  select(year, locationdesc, excellent) %>% 
+  ggplot(aes(x = year, y = excellent, color = locationdesc)) + 
+  geom_point() +
+  labs(
+    title = "Proportion of 'excellent' responses"
+  )
+```
 
 
 
