@@ -24,7 +24,8 @@ theme_set(theme_bw() + theme(legend.position = "bottom"))
 
 ## Problem 1
 
-```{r}
+**Reading and cleaning NYC Transit data :**
+```{r, message = FALSE}
 transit_df = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
   select(line, station_name, station_latitude, station_longitude, entry, vending, entrance_type, ada, starts_with("route")) %>% 
@@ -116,6 +117,7 @@ The first dataset contains multiple variables regarding the amount and types of 
 
 ## Problem 3
 
+**Reading and cleaning BRFSS data :**
 ```{r}
 brfss_df = filter(brfss_smart2010, Topic == "Overall Health") %>% # focusing on "overall health" topic
   janitor::clean_names() %>% 
@@ -129,7 +131,7 @@ brfss_df = filter(brfss_smart2010, Topic == "Overall Health") %>% # focusing on 
 This dataset contains information from `r nrow(distinct(brfss_df, locationdesc))` distinct locations and `r nrow(distinct(brfss_df, locationabbr))` distinct states - including the District of Columbia. `r state_freq = count(brfss_df, locationabbr)` `r abbr2state(state_freq[which.max(state_freq$n), 1])` is the state with the most observations. In 2002, the median of the "excellent" response values was `r brfss_df %>% group_by(year) %>% summarize(median_excl = median(excellent, na.rm = TRUE)) %>% filter(year == 2002) %>% select(median_excl)`. 
 
 **Histogram:**
-```{r}
+```{r, message = FALSE}
 brfss_df %>% 
   group_by(year) %>% 
   filter(year == 2002) %>% 
@@ -146,15 +148,11 @@ brfss_df %>%
 brfss_df %>% 
   filter(locationdesc %in% c("NY - New York County", "NY - Queens County")) %>% 
   select(year, locationdesc, excellent) %>% 
-  ggplot(aes(x = year, y = excellent, color = locationdesc)) + 
+  rename(location = locationdesc) %>% 
+  ggplot(aes(x = year, y = excellent, color = location)) + 
   geom_point() +
   labs(
     title = "Proportion of 'excellent' responses"
   )
 ```
-
-
-
-
-
 
